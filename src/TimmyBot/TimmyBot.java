@@ -103,6 +103,11 @@ public class TimmyBot {
 			if(samples[0] == 1){
 				cambiarModo();
 			}
+			Delay.msDelay(500);
+			sensorSample.fetchSample(samples, 0);
+			if(samples[0] == 1){
+				cambiarModo();
+			}
 			sensorSample = sensorUR.getDistanceMode();
 			sensorSample.fetchSample(samples, 0);
 			if(samples[0] <= 0.06){
