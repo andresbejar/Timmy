@@ -1,6 +1,8 @@
 package TimmyBot;
 
 import lejos.hardware.Button;
+import lejos.hardware.Sound;
+import lejos.hardware.ev3.LocalEV3;
 import lejos.hardware.lcd.LCD;
 import lejos.hardware.motor.EV3LargeRegulatedMotor;
 import lejos.hardware.motor.Motor;
@@ -25,6 +27,7 @@ public class TimmyBot {
 	static EV3TouchSensor sensorTacto;
 	static EV3UltrasonicSensor sensorUR;
 	static boolean pago;
+	static LocalEV3 brick;
 	
 	public enum modos{
 		IZQUIERDA, DERECHA;
@@ -65,16 +68,16 @@ public class TimmyBot {
 			
 			colorDetectado = sensorMonedas.getColorID();
 			if(colorDetectado == colorMoneda){
-				LCD.clearDisplay();
 				System.out.println("Moneda detectada");
 				boolean monedaInsertada = false;
+				Delay.msDelay(1000);
 				while(!monedaInsertada){
 					colorDetectado = sensorMonedas.getColorID();
 					if(colorDetectado != colorMoneda){
 						monedaInsertada = true;
+						Sound.beep();
 						setupConfites();
 						System.out.println("Ain't nuthin but a peanut!");
-						Delay.msDelay(3000);
 						LCD.clearDisplay();
 					}
 				}
@@ -101,12 +104,11 @@ public class TimmyBot {
 			sensorSample = sensorTacto.getTouchMode();
 			sensorSample.fetchSample(samples, 0);
 			if(samples[0] == 1){
-				cambiarModo();
-			}
-			Delay.msDelay(500);
-			sensorSample.fetchSample(samples, 0);
-			if(samples[0] == 1){
-				cambiarModo();
+				Delay.msDelay(500);
+				sensorSample.fetchSample(samples, 0);
+				if(samples[0] == 1){
+					cambiarModo();
+				}
 			}
 			sensorSample = sensorUR.getDistanceMode();
 			sensorSample.fetchSample(samples, 0);
@@ -114,6 +116,7 @@ public class TimmyBot {
 				//dar confites
 				detectoMano = true;
 				Delay.msDelay(1000);
+				Sound.beepSequenceUp();
 				if(modo == modos.IZQUIERDA){
 					leftMotor.rotateTo(45);
 					Delay.msDelay(500);
@@ -122,14 +125,16 @@ public class TimmyBot {
 				else{
 					rightMotor.rotateTo(45);
 					Delay.msDelay(500);
-					leftMotor.rotateTo(-60);
+					rightMotor.rotateTo(-60);
 				}
+				
 			}		
 		}
 	}
 	
 	public static void cambiarModo(){
 		modo = (modo == modo.IZQUIERDA)? modo.DERECHA: modo.IZQUIERDA;
+		Sound.beep();
 		imprimirModo();
 	}
 	
